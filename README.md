@@ -30,6 +30,7 @@ A senior-level task management and time-tracking web application featuring seaml
    DATABASE_URL=your_neon_postgresql_connection_string
    JWT_SECRET=your_jwt_secret_key
    GEMINI_API_KEY=your_google_gemini_api_key
+   OPENROUTER_API_KEY=your_openrouter_api_key
    ```
 
 4. **Run database migrations:**
