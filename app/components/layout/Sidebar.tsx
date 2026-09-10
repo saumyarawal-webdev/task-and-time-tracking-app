@@ -17,7 +17,7 @@ import { useUser } from "../../../hooks/useUser";
 import { useLogout } from "../../../hooks/useLogout";
 
 export default function Sidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const pathname = usePathname();
   
   const { data: user, isLoading } = useUser();
