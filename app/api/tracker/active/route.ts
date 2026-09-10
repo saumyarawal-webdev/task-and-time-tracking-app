@@ -18,7 +18,7 @@ export async function GET(req: Request) {
     const { payload } = await jwtVerify(token, secret);
     const userId = payload.userId as string;
 
-    // Sniff out the one log where endTime is still NULL
+    // the one log where endTime is still NULL
     const activeTimer = await db.query.timeLogs.findFirst({
       where: and(eq(timeLogs.userId, userId), isNull(timeLogs.endTime)),
     });

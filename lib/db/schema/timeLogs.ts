@@ -38,7 +38,7 @@ export const timeLogs = pgTable(
   },
   (table) => {
     return {
-      // Senior touch: A unique index that only applies when endTime is NULL.
+      // A unique index that only applies when endTime is NULL.
       // This strictly prevents a user from having more than one active timer at a time.
       activeTimerIndex: uniqueIndex("active_timer_idx")
         .on(table.userId)

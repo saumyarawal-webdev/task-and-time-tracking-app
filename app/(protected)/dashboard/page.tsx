@@ -1,10 +1,25 @@
 "use client";
 
 import { useSummary } from "../../../hooks/useSummery";
+import { useTimeLogs } from "@/hooks/useTimeLogs";
+import { useUser } from "@/hooks/useUser";
+import { useDashboardAI } from "@/hooks/useDashboardAI";
 import { Loader2, Activity, Clock, CheckCircle2, ListTodo, Sparkles, TrendingUp } from "lucide-react";
 
 export default function DashboardPage() {
-  const { data: summary, isLoading, isError } = useSummary();
+  const { data: summary, isLoading: isSummaryLoading, isError } = useSummary();
+  const { data: logs } = useTimeLogs();
+  const { data: user } = useUser();
+
+  // Create the payload only when all required data is ready
+  const aiPayload = summary && logs && user?.name ? {
+    summary,
+    logs,
+    userName: user.name
+  } : null;
+
+  // AI Hook manages its own caching and loading state
+  const { data: aiData, isLoading: isAiLoading } = useDashboardAI(aiPayload);
 
   const formatTime = (totalSeconds: number | undefined) => {
     if (!totalSeconds) return "0h 0m";
@@ -13,7 +28,7 @@ export default function DashboardPage() {
     return `${h}h ${m}m`;
   };
 
-  if (isLoading) {
+  if (isSummaryLoading) {
     return (
       <div className="flex items-center justify-center h-full min-h-[400px] text-zinc-500">
         <Loader2 className="animate-spin mr-2" size={24} />
@@ -99,20 +114,38 @@ export default function DashboardPage() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         
-        {/* AI Integration Placeholder (Spans 2 columns) */}
+        {/* AI Integration Panel (Spans 2 columns) */}
         <div className="lg:col-span-2 relative overflow-hidden bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-sm p-6 flex flex-col justify-center min-h-[300px] group">
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 dark:from-indigo-900/10 dark:to-purple-900/10 opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
           
-          <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-4">
-            <div className="p-4 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl animate-pulse">
-              <Sparkles className="text-indigo-600 dark:text-indigo-400" size={32} />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">AI Summary Integration Phase</h3>
-              <p className="text-zinc-500 dark:text-zinc-400 max-w-md mx-auto mt-2">
-                This space is reserved for our upcoming AI engine. It will analyze your time logs, predict task completion, and generate daily insights.
-              </p>
-            </div>
+          <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-4 h-full">
+            {isAiLoading ? (
+              <div className="flex flex-col items-center gap-4 text-indigo-500">
+                <Loader2 className="animate-spin" size={32} />
+                <p className="text-sm font-medium animate-pulse">AI is analyzing your productivity...</p>
+              </div>
+            ) : aiData?.insight ? (
+              <div className="flex flex-col items-center gap-4">
+                <div className="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl">
+                  <Sparkles className="text-indigo-600 dark:text-indigo-400" size={28} />
+                </div>
+                <p className="text-lg font-medium text-zinc-800 dark:text-zinc-200 leading-relaxed max-w-xl">
+                  {aiData.insight}
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="p-4 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl">
+                  <Sparkles className="text-indigo-600 dark:text-indigo-400" size={32} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">AI Summary Engine</h3>
+                  <p className="text-zinc-500 dark:text-zinc-400 max-w-md mx-auto mt-2">
+                    Log some time on your tasks today, and I will generate your personalized productivity insight!
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -124,7 +157,6 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex-1 flex flex-col justify-center gap-8">
-            {/* Custom CSS Progress Representation */}
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span className="font-semibold text-emerald-600 dark:text-emerald-400">Completed</span>

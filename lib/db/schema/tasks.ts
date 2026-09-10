@@ -25,9 +25,6 @@ export const tasks = pgTable("tasks", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
 
-  // Nullable field to store exactly what the user typed before AI processing.
-  rawInput: text("raw_input"),
-
   // The final title (manual or AI generated).
   title: text("title").notNull(),
 
@@ -36,9 +33,6 @@ export const tasks = pgTable("tasks", {
 
   // Default status is 'pending' when a new task is created.
   status: statusEnum("status").default("pending").notNull(),
-
-  // A boolean flag to help Suntek.ai reviewers clearly see where AI was utilized.
-  isAiGenerated: boolean("is_ai_generated").default(false).notNull(),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
