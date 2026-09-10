@@ -4,10 +4,14 @@ import { Clock, Sparkles, Activity, ArrowRight, ShieldCheck, Zap, BarChart3 } fr
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-indigo-500 selection:text-white relative">
+      {/* Background Dot Texture & Glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none opacity-60 z-0" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-indigo-500/10 dark:bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none z-0" />
+
       {/* Navbar */}
       <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between relative z-10">
           <div className="flex items-center gap-3">
             <Image 
               src="/favicon/android-chrome-192x192.png" 
@@ -37,11 +41,9 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="flex-1 flex flex-col items-center justify-center text-center px-6 py-20 lg:py-32 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-indigo-50/50 via-transparent to-transparent dark:from-indigo-950/20 pointer-events-none" />
-        
-        <div className="max-w-3xl mx-auto space-y-6 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-xs font-semibold tracking-wide uppercase">
+      <section className="flex-1 flex flex-col items-center justify-center text-center px-6 py-20 lg:py-32 relative z-10">
+        <div className="max-w-3xl mx-auto space-y-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-xs font-semibold tracking-wide uppercase border border-indigo-200/50 dark:border-indigo-800/50">
             <Sparkles size={14} /> Powered by Gemini AI
           </div>
           
@@ -71,7 +73,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="py-20 px-6 border-t border-border bg-muted/30">
+      <section id="features" className="py-20 px-6 border-t border-border bg-muted/30 relative z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-2xl mx-auto space-y-3 mb-16">
             <h2 className="text-3xl font-bold tracking-tight">Engineered for Peak Performance</h2>
@@ -113,7 +115,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border py-8 px-6 text-center text-sm text-muted-foreground">
+      <footer className="border-t border-border py-8 px-6 text-center text-sm text-muted-foreground relative z-10">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <p>© {new Date().getFullYear()} Task Time Logger. Made with &#x2665; by <Link href="https://saumya-rawal.vercel.app/" target="_blank" className="hover:underline">Saumya</Link></p>
           <div className="flex items-center gap-6">
