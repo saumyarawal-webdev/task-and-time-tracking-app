@@ -15,7 +15,7 @@ export const useGenerateTask = () => {
   return useMutation({
     mutationFn: async (payload: GeneratePayload) => {
       const { data } = await axios.post<GenerateTaskResponse>(
-        "/api/ai/generate-task",
+        "/api/ai/generate-task-openrouter",
         payload,
       );
       return data;

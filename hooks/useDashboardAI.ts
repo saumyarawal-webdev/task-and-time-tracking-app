@@ -17,7 +17,7 @@ export const useDashboardAI = (payload: DashboardAIPayload | null) => {
     queryFn: async () => {
       if (!payload) throw new Error("No payload provided");
       const { data } = await axios.post<DashboardAIResponse>(
-        "/api/ai/dashboard-summary",
+        "/api/ai/dashboard-summary-openrouter",
         payload,
       );
       return data;
