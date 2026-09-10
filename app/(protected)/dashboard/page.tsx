@@ -32,7 +32,7 @@ export default function DashboardPage() {
     return (
       <div className="flex items-center justify-center h-full min-h-[400px] text-zinc-500">
         <Loader2 className="animate-spin mr-2" size={24} />
-        <span>Loading dashboard layout...</span>
+        <span>Loading dashboard</span>
       </div>
     );
   }

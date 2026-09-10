@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import QueryProvider from "./providers/QueryProvider";
-// import { ThemeProvider } from "./components/ThemeProvider";
+import { ThemeProvider } from "./components/ThemeProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,6 +17,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Task and Time Tracking App",
   description: "AI Task and Time Tracking App that ease your daily workflow.",
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/favicon/favicon-32x32.png",
+    apple: "/favicon/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

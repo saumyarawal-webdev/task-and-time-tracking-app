@@ -19,7 +19,7 @@ export default function RegisterForm() {
       onSubmit={handleSubmit} 
       className="flex flex-col gap-4 w-full max-w-sm p-6 border border-border rounded-lg bg-background"
     >
-      <h2 className="text-2xl font-bold text-foreground mb-4">Create Account</h2>
+      <h2 className="text-2xl font-bold text-center text-foreground mb-4">Create Account</h2>
       
       {isError && (
         <p className="text-red-500 text-sm">Registration failed. Please try again.</p>
