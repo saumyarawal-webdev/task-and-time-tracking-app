@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     const userId = payload.userId as string;
 
     const body = await req.json();
-    const { title, description, rawInput, isAiGenerated, status } = body;
+    const { title, description, status } = body;
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -58,8 +58,6 @@ export async function POST(req: Request) {
         userId,
         title,
         description,
-        rawInput,
-        isAiGenerated: isAiGenerated || false,
         status: status || "pending",
       })
       .returning();
