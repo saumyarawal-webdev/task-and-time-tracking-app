@@ -8,7 +8,7 @@ export function proxy(request: NextRequest) {
   const publicPaths = ["/", "/login", "/register"];
   const isPublicPath = publicPaths.includes(path);
 
-  const privatePaths = ["/dashboard", "/tasks", "/tracker"];
+  const privatePaths = ["/dashboard", "/tasks", "/timelog"];
   const isPrivatePath = privatePaths.some((p) => path.startsWith(p));
 
   if (!token && isPrivatePath) {

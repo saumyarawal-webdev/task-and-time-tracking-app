@@ -25,7 +25,7 @@ export default function Sidebar() {
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Tasks", href: "/tasks", icon: CheckSquare },
-    { name: "Tracker", href: "/tracker", icon: Timer },
+    { name: "Time Log", href: "/timelog", icon: Timer },
   ];
 
   return (
