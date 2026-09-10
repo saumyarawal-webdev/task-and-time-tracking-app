@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { SignJWT } from "jose";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
+    const { email, password, name } = await req.json();
 
-    // 1. Check if the user already exists
     const existingUser = await db.query.users.findFirst({
       where: eq(users.email, email),
     });
@@ -20,22 +20,36 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Hash the password securely (10 salt rounds is the industry standard)
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // 3. Insert the new user into our Neon database
     const [newUser] = await db
       .insert(users)
-      .values({
-        email,
-        passwordHash,
-      })
-      .returning({
-        id: users.id,
-        email: users.email,
-      }); // We only return safe data, NEVER the passwordHash!
+      .values({ email, passwordHash, name })
+      .returning({ id: users.id, email: users.email, name: users.name });
 
-    return NextResponse.json({ user: newUser }, { status: 201 });
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET missing in .env.local");
+    }
+
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    const token = await new SignJWT({ userId: newUser.id })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("7d")
+      .sign(secret);
+
+    const response = NextResponse.json({ user: newUser }, { status: 201 });
+
+    response.cookies.set({
+      name: "auth_token",
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    });
+
+    return response;
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(

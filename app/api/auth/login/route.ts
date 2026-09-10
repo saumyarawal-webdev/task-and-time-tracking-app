@@ -9,7 +9,6 @@ export async function POST(req: Request) {
   try {
     const { email, password } = await req.json();
 
-    // 1. Find the user by email
     const user = await db.query.users.findFirst({
       where: eq(users.email, email),
     });
@@ -21,7 +20,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Verify the password
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
 
     if (!isValidPassword) {
@@ -31,27 +29,28 @@ export async function POST(req: Request) {
       );
     }
 
-    // 3. Create the JWT payload and sign it using 'jose'
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET missing in .env.local");
+    }
+
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const token = await new SignJWT({ userId: user.id })
       .setProtectedHeader({ alg: "HS256" })
-      .setExpirationTime("7d") // Token expires in 7 days
+      .setExpirationTime("7d")
       .sign(secret);
 
-    // 4. Prepare the response and set the HTTP-only cookie
     const response = NextResponse.json(
-      { user: { id: user.id, email: user.email } },
+      { user: { id: user.id, email: user.email, name: user.name } },
       { status: 200 },
     );
 
-    // HTTP-only prevents JavaScript from accessing the token, blocking XSS attacks.
     response.cookies.set({
       name: "auth_token",
       value: token,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 7, // 7 days in seconds
+      maxAge: 60 * 60 * 24 * 7,
       path: "/",
     });
 
