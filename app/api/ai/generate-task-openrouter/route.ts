@@ -32,13 +32,14 @@ Current Description: "${description || ""}"
 
 RULES (follow exactly, in order):
 1. If both title and description are empty or meaningless (e.g. random characters, single letters, "asdf"), return the input back with minimal cleanup — do NOT invent a fictional task.
-2. If only the title is provided, generate a description that logically explains HOW to complete that exact task (a concrete first action), not a vague restatement.
-3. If only the description is provided, generate a short title that names the task, not the description.
+2. If only the title is provided, you MUST still generate a description — never leave it empty or omit it. The description must explain HOW to complete that exact task (a concrete first action).
+3. If only the description is provided, you MUST still generate a title — never leave it empty or omit it. The title must name the task, not restate the description.
 4. If both exist, rewrite both to be clearer and more actionable, without changing the user's original intent or task subject.
 5. Title: maximum 6 words. Use Title Case. No punctuation at the end. No generic words like "Task", "Thing", "Item".
 6. Description: exactly 1 sentence, 10–20 words. Must state a specific, concrete action (who/what/how), not a summary of the title. No filler like "This task involves..." or "Make sure to...".
 7. Never use emojis, exclamation marks, or first-person language ("I will", "we need to").
 8. Do not add information that wasn't implied by the input (no fake names, tools, or deadlines unless mentioned).
+9. MANDATORY CHECK before responding: your JSON object must contain a non-empty "title" string AND a non-empty "description" string, no matter which one was originally missing. A response missing either key or leaving one blank is INVALID and must not be returned.
 
 EXAMPLES:
 Input title: "follow up with designer"
@@ -52,7 +53,7 @@ Output: {"title": "Call Client About Invoice", "description": "Call the client t
 
 OUTPUT FORMAT (STRICT):
 - Return ONLY a raw JSON object. No markdown. No backticks. No code fences. No explanation before or after.
-- The JSON must contain EXACTLY two keys: "title" (string) and "description" (string). No extra keys.
+- The JSON must contain EXACTLY two keys: "title" (string) and "description" (string), both non-empty. No extra keys.
 - The response must start with { and end with } — nothing else.`;
 
     const response = await fetch(
