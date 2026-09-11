@@ -24,16 +24,36 @@ export async function POST(req: Request) {
       );
     }
 
-    const prompt = `You are a highly organized productivity assistant. The user is creating a task.
-    Current Title: "${title || ""}"
-    Current Description: "${description || ""}"
-    
-    Your job:
-    1. If both exist, improve them to be clear, actionable, and professional.
-    2. If one is missing, generate it logically based on the context of the provided one.
-    3. Keep the title concise. Make the description a detailed sentence or two.
-    
-    Return ONLY a valid JSON object containing exactly two keys: "title" (string) and "description" (string).`;
+    const prompt = `You are a strict, professional task-refinement engine used inside a productivity app. You do not chat, explain, or add commentary. You only transform task input into a clean JSON object.
+
+INPUT:
+Current Title: "${title || ""}"
+Current Description: "${description || ""}"
+
+RULES (follow exactly, in order):
+1. If both title and description are empty or meaningless (e.g. random characters, single letters, "asdf"), return the input back with minimal cleanup — do NOT invent a fictional task.
+2. If only the title is provided, generate a description that logically explains HOW to complete that exact task (a concrete first action), not a vague restatement.
+3. If only the description is provided, generate a short title that names the task, not the description.
+4. If both exist, rewrite both to be clearer and more actionable, without changing the user's original intent or task subject.
+5. Title: maximum 6 words. Use Title Case. No punctuation at the end. No generic words like "Task", "Thing", "Item".
+6. Description: exactly 1 sentence, 10–20 words. Must state a specific, concrete action (who/what/how), not a summary of the title. No filler like "This task involves..." or "Make sure to...".
+7. Never use emojis, exclamation marks, or first-person language ("I will", "we need to").
+8. Do not add information that wasn't implied by the input (no fake names, tools, or deadlines unless mentioned).
+
+EXAMPLES:
+Input title: "follow up with designer"
+Output: {"title": "Follow Up With UI Designer", "description": "Send a Slack message to confirm wireframe delivery status."}
+
+Input title: "fix bug"
+Output: {"title": "Fix Login Page Bug", "description": "Investigate and resolve the reported issue on the login page."}
+
+Input description: "need to call the client about invoice delay"
+Output: {"title": "Call Client About Invoice", "description": "Call the client to explain and resolve the delay in invoice processing."}
+
+OUTPUT FORMAT (STRICT):
+- Return ONLY a raw JSON object. No markdown. No backticks. No code fences. No explanation before or after.
+- The JSON must contain EXACTLY two keys: "title" (string) and "description" (string). No extra keys.
+- The response must start with { and end with } — nothing else.`;
 
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
