@@ -12,7 +12,7 @@ export function proxy(request: NextRequest) {
   const isPrivatePath = privatePaths.some((p) => path.startsWith(p));
 
   if (!token && isPrivatePath) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   if (token && isPublicPath) {

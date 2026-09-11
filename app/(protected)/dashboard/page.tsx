@@ -309,32 +309,32 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="flex flex-col items-center w-full">
-                <div className="p-2.5 md:p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg md:rounded-2xl mb-3 md:mb-5 shadow-sm border border-zinc-100 dark:border-zinc-800">
+                <div className="p-3 md:p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl md:rounded-2xl mb-4 md:mb-5 shadow-sm border border-zinc-100 dark:border-zinc-800">
                   <Sparkles
-                    className="text-zinc-600 dark:text-zinc-400 w-4 h-4 md:w-7 md:h-7"
+                    className="text-zinc-600 dark:text-zinc-400 w-5 h-5 md:w-7 md:h-7"
                     strokeWidth={1.5}
                   />
                 </div>
-                <h3 className="text-lg md:text-2xl font-semibold text-zinc-800 dark:text-zinc-200 mb-1.5 md:mb-2 tracking-tight">
+                <h3 className="text-xl md:text-2xl font-semibold text-zinc-800 dark:text-zinc-200 mb-2 tracking-tight">
                   AI Summary Engine
                 </h3>
-                <p className="text-xs md:text-sm text-zinc-500 dark:text-zinc-400 mb-4 md:mb-6 max-w-sm px-2 md:px-0">
+                <p className="text-xs md:text-sm text-zinc-500 dark:text-zinc-400 mb-5 md:mb-6 max-w-sm px-4 md:px-0">
                   Unlock a premium analysis of your daily tracking patterns and
                   task efficiency.
                 </p>
 
                 <button
                   onClick={() => setTriggerAi(true)}
-                  className="group relative flex items-center gap-1.5 md:gap-2 px-3.5 md:px-6 py-1.5 md:py-2.5 text-xs md:text-base bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-medium rounded-md md:rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all shadow-md hover:shadow-lg active:scale-95 mb-4 md:mb-6"
+                  className="group relative flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2 md:py-2.5 text-sm md:text-base bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-medium rounded-lg md:rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all shadow-md hover:shadow-lg active:scale-95 mb-5 md:mb-6"
                 >
-                  <Sparkles className="w-3.5 h-3.5 md:w-5 md:h-5 group-hover:animate-pulse" />
+                  <Sparkles className="w-4 h-4 md:w-5 md:h-5 group-hover:animate-pulse" />
                   Generate Insight
                 </button>
 
-                <div className="w-full max-w-md bg-zinc-50/80 dark:bg-zinc-800/30 p-2.5 md:p-5 rounded-lg md:rounded-2xl text-left border border-zinc-200/50 dark:border-zinc-700/50 backdrop-blur-sm">
+                <div className="w-full max-w-md bg-zinc-50/80 dark:bg-zinc-800/30 p-3 md:p-5 rounded-xl md:rounded-2xl text-left border border-zinc-200/50 dark:border-zinc-700/50 backdrop-blur-sm">
                   <div className="flex items-start gap-2 md:gap-3">
-                    <div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500 mt-1.5 shrink-0" />
-                    <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500 mt-1 md:mt-1.5 shrink-0" />
+                    <p className="text-[11px] md:text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
                       <strong className="text-zinc-700 dark:text-zinc-300 font-semibold">
                         For Reviewers:
                       </strong>{" "}
