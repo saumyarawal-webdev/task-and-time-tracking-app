@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSummary } from "../../../hooks/useSummary";
 import { useTimeLogs } from "@/hooks/useTimeLogs";
 import { useUser } from "@/hooks/useUser";
@@ -18,12 +18,22 @@ import {
 } from "recharts";
 
 export default function DashboardPage() {
+  const [showAnimations, setShowAnimations] = useState(false);
   const [triggerAi, setTriggerAi] = useState(false);
 
   const { data: summary, isLoading: isSummaryLoading, isError } = useSummary();
   const { data: logs } = useTimeLogs();
   const { data: user } = useUser();
 
+  // Animation trigger: fires only after dashboard loading is complete
+  useEffect(() => {
+    if (!isSummaryLoading && !isError) {
+      const timer = setTimeout(() => setShowAnimations(true), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isSummaryLoading, isError]);
+
+  // AI only triggers when button is clicked (triggerAi becomes true)
   const aiPayload = triggerAi && summary && logs && user?.name ? { summary, logs, userName: user.name } : null;
   const { data: aiData, isLoading: isAiLoading } = useDashboardAI(aiPayload);
 
@@ -39,7 +49,7 @@ export default function DashboardPage() {
     return (
       <div className="flex items-center justify-center h-full min-h-[400px] text-zinc-500">
         <Loader2 className="animate-spin mr-2" size={24} />
-        <span>Loading dashboard</span>
+        <span>Loading dashboard...</span>
       </div>
     );
   }
@@ -52,16 +62,18 @@ export default function DashboardPage() {
     );
   }
 
+  const safeTrackedTime = Number(summary?.totalTimeTracked || 0);
   const totalTasks = (summary?.completedTasks || 0) + (summary?.pendingOrInProgress || 0);
+  
   const completionPercentage = totalTasks === 0 ? 0 : Math.round(((summary?.completedTasks || 0) / totalTasks) * 100);
   const pendingPercentage = totalTasks === 0 ? 0 : 100 - completionPercentage;
 
-  const trackedDayPercent = Math.min(100, Math.round(((summary?.totalTimeTracked || 0) / (8 * 3600)) * 100));
+  const trackedDayPercent = Math.min(100, Math.round((safeTrackedTime / (8 * 3600)) * 100));
   const touchedCompletedPct = totalTasks === 0 ? 0 : ((summary?.completedTasks || 0) / totalTasks) * 100;
   const touchedPendingPct = totalTasks === 0 ? 0 : ((summary?.pendingOrInProgress || 0) / totalTasks) * 100;
 
   const topCards = [
-    { title: "Today's Tracked", value: formatTime(summary?.totalTimeTracked), icon: Clock },
+    { title: "Today's Tracked", value: formatTime(safeTrackedTime), icon: Clock },
     { title: "Tasks Touched", value: summary?.tasksWorkedOn || 0, icon: Activity },
     { title: "Completed", value: summary?.completedTasks || 0, icon: CheckCircle2 },
     { title: "In Progress", value: summary?.pendingOrInProgress || 0, icon: ListTodo },
@@ -76,14 +88,12 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Top Stats Row — chart-first, monochrome cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {topCards.map((card, index) => (
           <div
             key={index}
             className="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden flex flex-col transition-transform hover:-translate-y-1 duration-300"
           >
-            {/* Chart zone — dominant */}
             <div className="flex-1 flex items-center justify-center h-32 pt-4">
               {index === 0 && (
                 <ResponsiveContainer width={100} height={100}>
@@ -91,12 +101,20 @@ export default function DashboardPage() {
                     innerRadius="72%"
                     outerRadius="100%"
                     barSize={9}
-                    data={[{ value: trackedDayPercent }]}
+                    data={[{ value: showAnimations ? (trackedDayPercent || 0.1) : 0.1 }]}
                     startAngle={90}
                     endAngle={-270}
                   >
                     <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-                    <RadialBar dataKey="value" cornerRadius={8} fill="#18181b" className="dark:fill-zinc-100" background={{ fill: "#e4e4e7" }} />
+                    <RadialBar 
+                      dataKey="value" 
+                      cornerRadius={8} 
+                      fill="#18181b" 
+                      className="dark:fill-zinc-100" 
+                      background={{ fill: "#e4e4e7" }} 
+                      isAnimationActive={true}
+                      animationDuration={1200}
+                    />
                   </RadialBarChart>
                 </ResponsiveContainer>
               )}
@@ -104,8 +122,8 @@ export default function DashboardPage() {
               {index === 1 && (
                 <div className="w-full px-6">
                   <div className="h-4 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden flex">
-                    <div className="h-full bg-zinc-900 dark:bg-zinc-100 transition-all duration-700" style={{ width: `${touchedCompletedPct}%` }} />
-                    <div className="h-full bg-zinc-400 dark:bg-zinc-600 transition-all duration-700" style={{ width: `${touchedPendingPct}%` }} />
+                    <div className="h-full bg-zinc-900 dark:bg-zinc-100 transition-all duration-1000 ease-out" style={{ width: showAnimations ? `${touchedCompletedPct}%` : '0%' }} />
+                    <div className="h-full bg-zinc-400 dark:bg-zinc-600 transition-all duration-1000 ease-out" style={{ width: showAnimations ? `${touchedPendingPct}%` : '0%' }} />
                   </div>
                   <div className="flex justify-between mt-2 text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
                     <span>Done</span>
@@ -115,37 +133,48 @@ export default function DashboardPage() {
               )}
 
               {index === 2 && (
-                <ResponsiveContainer width={110} height={70}>
-                  <RadialBarChart
-                    innerRadius="78%"
-                    outerRadius="100%"
-                    barSize={10}
-                    data={[{ value: completionPercentage }]}
-                    startAngle={180}
-                    endAngle={0}
-                  >
-                    <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-                    <RadialBar dataKey="value" cornerRadius={8} fill="#18181b" className="dark:fill-zinc-100" background={{ fill: "#e4e4e7" }} />
-                  </RadialBarChart>
-                </ResponsiveContainer>
+                <div className="w-full px-4 h-full flex items-end">
+                  <ResponsiveContainer width="100%" height={110}>
+                    <RadialBarChart
+                      cx="50%"
+                      cy="80%"
+                      innerRadius="60%"
+                      outerRadius="100%"
+                      barSize={28}
+                      data={[{ value: showAnimations ? (completionPercentage || 0.1) : 0.1 }]}
+                      startAngle={180}
+                      endAngle={0}
+                    >
+                      <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
+                      <RadialBar 
+                        dataKey="value" 
+                        cornerRadius={12} 
+                        fill="#18181b" 
+                        className="dark:fill-zinc-100" 
+                        background={{ fill: "#e4e4e7" }} 
+                        isAnimationActive={true}
+                        animationDuration={1200}
+                      />
+                    </RadialBarChart>
+                  </ResponsiveContainer>
+                </div>
               )}
 
               {index === 3 && (
-                <div className="flex items-end justify-center gap-1.5 h-24">
+                <div className="flex items-end justify-center gap-2 h-28 w-full px-4">
                   {[40, 65, 50, 80, pendingPercentage].map((h, i) => (
                     <div
                       key={i}
-                      className={`w-3 rounded-t-sm transition-all duration-700 ${
+                      className={`w-6 rounded-t-md transition-all duration-1000 ease-out ${
                         i === 4 ? "bg-zinc-900 dark:bg-zinc-100" : "bg-zinc-200 dark:bg-zinc-700"
                       }`}
-                      style={{ height: `${h}%` }}
+                      style={{ height: showAnimations ? `${h}%` : '0%' }}
                     />
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Compact label row */}
             <div className="flex items-center justify-between px-5 py-3 border-t border-zinc-100 dark:border-zinc-800">
               <div className="flex items-center gap-2">
                 <card.icon className="text-zinc-400 dark:text-zinc-500" size={14} strokeWidth={2.5} />
@@ -157,9 +186,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        {/* AI Integration Panel (Spans 2 columns) */}
         <div className="lg:col-span-2 relative overflow-hidden bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-sm p-6 flex flex-col justify-center min-h-[300px] group">
           <div className="absolute inset-0 bg-gradient-to-br from-zinc-50 to-zinc-100/50 dark:from-zinc-800/20 dark:to-zinc-900/20 opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -204,7 +231,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Status Distribution Panel (Spans 1 column) - Donut Chart */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-sm p-6 flex flex-col">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Task States</h3>
@@ -216,8 +242,8 @@ export default function DashboardPage() {
               <PieChart>
                 <Pie
                   data={[
-                    { name: "Completed", value: completionPercentage },
-                    { name: "Pending / Working", value: pendingPercentage },
+                    { name: "Completed", value: showAnimations ? (completionPercentage || 0.1) : 0.1 },
+                    { name: "Pending / Working", value: showAnimations ? (pendingPercentage || 0.1) : 0.1 },
                   ]}
                   cx="50%"
                   cy="50%"
@@ -229,12 +255,14 @@ export default function DashboardPage() {
                   cornerRadius={8}
                   dataKey="value"
                   stroke="none"
+                  isAnimationActive={true}
+                  animationDuration={1200}
                 >
                   <Cell fill="#18181b" />
                   <Cell fill="#a1a1aa" />
                 </Pie>
                 <Tooltip
-                  formatter={(value, name) => [`${value}%`, name]}
+                  formatter={(value: any, name: any) => [`${Math.round(value)}%`, name]}
                   contentStyle={{ borderRadius: "12px", border: "1px solid #e4e4e7", fontSize: "13px", fontWeight: 600 }}
                 />
               </PieChart>
