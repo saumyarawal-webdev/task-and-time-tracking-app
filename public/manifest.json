@@ -1,6 +1,6 @@
 {
-  "name": "Task Time Logger",
-  "short_name": "TaskLogger",
+  "name": "Task Time Tracker",
+  "short_name": "Task Tracker",
   "description": "A senior-level productivity and time tracking dashboard with AI insights",
   "start_url": "/",
   "display": "standalone",
